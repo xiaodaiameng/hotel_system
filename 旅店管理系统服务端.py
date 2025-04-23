@@ -20,7 +20,7 @@ def init_database():
         return False
     try:
         with conn.cursor() as cursor:
-
+            '''一个是管理员表,仅一行,包括id,管理员名称以及密码'''
             cursor.execute('''CREATE TABLE IF NOT EXISTS managers_table (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
@@ -42,7 +42,6 @@ def init_database():
                                 FOREIGN KEY (customer_name) REFERENCES customers_table(name) ON DELETE SET NULL)''')
             conn.commit()
             #初始化:管理员密码
-            # 将用户密码通过bcrypt哈希后存储到数据库
             cursor.execute("SELECT COUNT(*) FROM managers_table")
             if cursor.fetchone()[0] == 0:
                 cursor.execute("INSERT INTO managers_table (username, password) VALUES (%s, %s)",('管理员','pass123456'))
