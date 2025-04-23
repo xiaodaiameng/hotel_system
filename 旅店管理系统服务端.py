@@ -731,7 +731,7 @@ def main():
     # 创建会话对象
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 建立连接
-    SERVER_ADDRESS = '192.168.219.83'
+    SERVER_ADDRESS = '0.0.0.0'
     server.bind((SERVER_ADDRESS, 8001))
     # 设置监听
     server.listen(5)
