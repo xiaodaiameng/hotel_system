@@ -2,6 +2,7 @@ import re
 import socket
 import pymysql
 import threading
+import bcrypt
 
 #连接数据库的函数
 def create_db_connection():
@@ -44,7 +45,8 @@ def init_database():
             #初始化:管理员密码
             cursor.execute("SELECT COUNT(*) FROM managers_table")
             if cursor.fetchone()[0] == 0:
-                cursor.execute("INSERT INTO managers_table (username, password) VALUES (%s, %s)",('管理员','pass123456'))
+                hashed_pwd = bcrypt.hashpw('pass123456'.encode('utf-8'), bcrypt.gensalt()) #虽然他发黄,但是可以运行且正确
+                cursor.execute("INSERT INTO managers_table (username, password) VALUES (%s, %s)", ('管理员', hashed_pwd))
                 conn.commit()
             #初始化:有两个用户
             cursor.execute("SELECT COUNT(*) FROM customers_table")
