@@ -41,17 +41,15 @@
 
 3. 接着 切换模式(定义表格式/写入数据到表):
 
-把光标移动在customers_table处就能看见扳手和正方形表格图标如图所示:
-
-- ![image-20250520022907952](README相关图片\关于代码的简单说明.assets\image-20250520022907952.png)
+把光标移动在customers_table,各个table处, 就能看见扳手和正方形表格图标(忘记拉取图片了,此处没有示例图片):
 
 点击正方形图标, 开始各个表内的数据初始化:
 
-(1)<img src="C:\Users\30616\Desktop\README相关图片\_5.png" alt="image-20250520022728495" style="zoom:50%;" />
+(1)<img src="README相关图片\_5.png" alt="image-20250520022728495" style="zoom:50%;" />
 
-(2)<img src="C:\Users\30616\Desktop\README相关图片\_6.png" alt="image-20250520022742997" style="zoom:50%;" />
+(2)<img src="README相关图片\_6.png" alt="image-20250520022742997" style="zoom:50%;" />
 
-(3)<img src="C:\Users\30616\Desktop\README相关图片\_7.png" alt="image-20250520022754092" style="zoom:50%;" />
+(3)<img src="README相关图片\_7.png" alt="image-20250520022754092" style="zoom:50%;" />
 
 ## 四.使用说明
 
@@ -65,7 +63,7 @@
 
 - 需要保证mysql中已经创建了需要的表,
 - 需要在命令行中启动数据库,输入:   mysql -u root -p   (没有分号) 回车后提示输入密码   123456  再回车,出现此界面说明MySQL已在后台成功启动:
-  <img src="C:\Users\30616\Desktop\README相关图片\命令行.png" alt="image-20250520221130512" style="zoom: 33%;" />
+  <img src="README相关图片\命令行.png" alt="image-20250520221130512" style="zoom: 33%;" />
 
 注意: 各不相同的本机MySQL用户设置的密码可能不一样
 
@@ -100,8 +98,6 @@ finally:
 ### 2. 但是,存在的问题比如:
 
 - 有时候连接真是个问题啊(还没学那么多,干笑.jpg),有关退出的代码还没有完善. 此时代码已被提交,暂时不再修改.
-  <img src="C:\Users\30616\Desktop\关于代码的简单说明.assets\存在问题_1.jpg" alt="存在问题_1" style="zoom:10%;" />
-
 - 此次代码没有使用哈希函数,因为当时使用时代码改来改去,迟迟不能认证成功,本人运行破防了,后面干脆删掉了.ai提示我哈希很重要,生产环境必须使用哈希（如bcrypt）+ 盐值加密,所以以后有心情就补进去.
 - 学长建议的日志管理还没有实现,没有写入提交上来的代码里.(扶额苦哭.jpg)
 
@@ -111,7 +107,7 @@ finally:
 
 ---
 
-<img src="README相关图片\手写代码目录第二页.png" alt="image-20250521190804881" style="zoom:25%;" />
+<img src="README相关图片\手写代码目录第二页.jpg" alt="image-20250521190804881" style="zoom:25%;" />
 
 ---
 
