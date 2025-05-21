@@ -1,7 +1,7 @@
 [关于代码的简单说明.md](https://github.com/user-attachments/files/20367364/default.md)展开如下:
 # [旅店管理系统] 代码说明
 
-<img src="C:\Users\30616\Desktop\README相关图片\logo_1.png" alt="image-20250521092613420" style="zoom: 50%;" /><img src="C:\Users\30616\Desktop\README相关图片\logo_2.png" alt="image-20250521092728886" style="zoom: 50%;" /><img src="C:\Users\30616\Desktop\README相关图片\logo_3.png" alt="image-20250521093128548" style="zoom: 50%;" />
+<img src="README相关图片\logo_1.png" alt="image-20250521092613420" style="zoom: 50%;" /><img src="README相关图片\logo_2.png" alt="image-20250521092728886" style="zoom: 50%;" /><img src="README相关图片\logo_3.png" alt="image-20250521093128548" style="zoom: 50%;" />
 
 ## 一 .项目概述
 
@@ -25,25 +25,25 @@
 
 观看教程后,即可学会建库,建表.
 
-<img src="C:\Users\30616\Desktop\关于代码的简单说明.assets\安装指南_1.jpg" alt="安装指南_1" style="zoom: 15%;" /><img src="C:\Users\30616\Desktop\关于代码的简单说明.assets\安装指南_2.jpg" alt="安装指南_2" style="zoom: 10%;" />
+<img src="README相关图片\安装指南_1.jpg" alt="安装指南_1" style="zoom: 15%;" /><img src="README相关图片\安装指南_2.jpg" alt="安装指南_2" style="zoom: 10%;" />
 
 2. 以下是需要建立的库(library)和表(table):
 
 - 注意:创建表可以在命令行启动数据库后输入代码创建,也可以在数据库软件本身提供的图形化界面点击与勾选,就是以下流程.建立过程中如果有apply选项就都要点击,是保存的意思.
 
-(1)<img src="C:\Users\30616\Desktop\README相关图片\数据库图形化界面相关_1.png" alt="image-20250520022041318" style="zoom: 80%;" />
+(1)<img src="README相关图片\数据库图形化界面相关_1.png" alt="image-20250520022041318" style="zoom: 80%;" />
 
-(2)<img src="C:\Users\30616\Desktop\README相关图片\_2.png" alt="image-20250520022120328" style="zoom: 50%;" />
+(2)<img src="README相关图片\_2.png" alt="image-20250520022120328" style="zoom: 50%;" />
 
-(3)<img src="C:\Users\30616\Desktop\README相关图片\_3.png" alt="image-20250520022351949" style="zoom: 50%;" />
+(3)<img src="README相关图片\_3.png" alt="image-20250520022351949" style="zoom: 50%;" />
 
-(4)<img src="C:\Users\30616\Desktop\README相关图片\_4.png" alt="image-20250520022429422" style="zoom: 50%;" />
+(4)<img src="README相关图片\_4.png" alt="image-20250520022429422" style="zoom: 50%;" />
 
 3. 接着 切换模式(定义表格式/写入数据到表):
 
-把光标移动在customers_table处就能看见扳手 <img src="C:\Users\30616\Desktop\README相关图片\扳手.png" alt="004AF67D" style="zoom:80%;" />和正方形表格图标  <img src="C:\Users\30616\Desktop\README相关图片\本子和笔.png" alt="image-20250521173718822" style="zoom:25%;" /> 如图所示:
+把光标移动在customers_table处就能看见扳手 <img src="C:\Users\30616\Desktop\README相关图片\扳手.png" alt="004AF67D" style="zoom:80%;" />和正方形表格图标  <img src="README相关图片\本子和笔.png" alt="image-20250521173718822" style="zoom:25%;" /> 如图所示:
 
-- ![image-20250520022907952](C:\Users\30616\Desktop\关于代码的简单说明.assets\image-20250520022907952.png)
+- ![image-20250520022907952](README相关图片\关于代码的简单说明.assets\image-20250520022907952.png)
 
 点击正方形图标, 开始各个表内的数据初始化:
 
@@ -107,11 +107,11 @@ finally:
 
 ### 3. 服务端代码大纲(共两页):
 
-<img src="C:\Users\30616\Desktop\关于代码的简单说明.assets\14330b0659717b17e40542bf20952c4.jpg" alt="14330b0659717b17e40542bf20952c4" style="zoom: 25%;" />
+<img src="README相关图片\手写代码目录_1.jpg" alt="14330b0659717b17e40542bf20952c4" style="zoom: 25%;" />
 
 ---
 
-<img src="C:\Users\30616\Desktop\关于代码的简单说明.assets\image-20250521190804881.png" alt="image-20250521190804881" style="zoom:25%;" />
+<img src="README相关图片\手写代码目录第二页.png" alt="image-20250521190804881" style="zoom:25%;" />
 
 ---
 
