@@ -41,7 +41,7 @@
 
 3. 接着 切换模式(定义表格式/写入数据到表):
 
-把光标移动在customers_table处就能看见扳手 <img src="README相关图片\扳手.png" alt="004AF67D" style="zoom:10%;" />和正方形表格图标  <img src="README相关图片\本子和笔.png" alt="image-20250521173718822" style="zoom:5%;" /> 如图所示:
+把光标移动在customers_table处就能看见扳手和正方形表格图标如图所示:
 
 - ![image-20250520022907952](README相关图片\关于代码的简单说明.assets\image-20250520022907952.png)
 
