@@ -1,4 +1,5 @@
 import re
+import time
 import socket
 import pymysql
 import threading
@@ -51,6 +52,7 @@ def _0_close_connection(client_socket):
     except Exception as e:
         handle_send(client_socket, f'关闭连接出现错误:{e}')
     finally:
+        time.sleep(1)
         client_socket.close()
 @db_connection_handler
 def init_database(conn = None):
