@@ -1,3 +1,4 @@
+import time
 import socket
 import threading
 def receive_messages(client_socket):
@@ -21,10 +22,12 @@ def send_messages(client_socket):
                 if send_to_server.lower() == 'exit':
                     handle_send(client_socket, send_to_server)
                     client_socket.shutdown(socket.SHUT_WR)  # 禁止发送
+                    time.sleep(1)
                     break
                 if send_to_server == '0':
                     handle_send(client_socket, send_to_server)
                     client_socket.shutdown(socket.SHUT_WR)  # 禁止发送
+                    time.sleep(1)
                     break
                 handle_send(client_socket, send_to_server)
             except (ConnectionResetError, OSError) as e:
