@@ -33,7 +33,7 @@
 
 (1)<img src="README相关图片\数据库图形化界面相关_1.png" alt="image-20250520022041318" style="zoom: 80%;" />
 
-(2)<img src="README相关图片\_2.png" alt="image-20250520022120328" style="zoom: 50%;" />
+(2)<img src="README相关图片\屏幕截图 2025-05-31 120621.png" alt="image-20250520022120328" style="zoom: 50%;" />
 
 (3)<img src="README相关图片\_3.png" alt="image-20250520022351949" style="zoom: 50%;" />
 
