@@ -64,7 +64,7 @@ def init_database(conn = None):
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(60) NOT NULL)""")
-            #一个是用户表customers_table,里面有id,用户名name,余额balance,is_deleted,deleted_at共五列
+            #一个是用户表customers_table,里面有id,用户名name,余额balance,is_deleted共四列
             cursor.execute("""CREATE TABLE IF NOT EXISTS customers_table
                                 (id INT AUTO_INCREMENT PRIMARY KEY,
                                 name VARCHAR(50) UNIQUE NOT NULL,
