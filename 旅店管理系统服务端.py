@@ -64,7 +64,7 @@ def init_database(conn = None):
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password VARCHAR(60) NOT NULL)""")
-            #一个是用户表customers_table,里面有id,用户名name,余额balance一共三列
+            #一个是用户表customers_table,里面有id,用户名name,余额balance,is_deleted,deleted_at共五列
             cursor.execute("""CREATE TABLE IF NOT EXISTS customers_table
                                 (id INT AUTO_INCREMENT PRIMARY KEY,
                                 name VARCHAR(50) UNIQUE NOT NULL,
@@ -145,17 +145,18 @@ class CustomerManager:
             with conn.cursor() as cursor:
                 handle_send(client_socket,'请输入您的旧账号名称:')
                 old_name = handle_receive(client_socket)
-                cursor.execute("SELECT name FROM customers_table WHERE name = %s", (old_name,))
+                if old_name == '0':
+                    _0_close_connection(client_socket)
+                cursor.execute("SELECT name FROM customers_table WHERE name = %s and is_deleted = 0", (old_name,))
                 if cursor.fetchone():
                     handle_send(client_socket, "请输入新名称:")
                     new_name = handle_receive(client_socket)
                     cursor.execute("UPDATE customers_table SET name = %s WHERE name = %s", (new_name, old_name))
                     conn.commit()  # 提交更改
-                    handle_send(client_socket, f'修改成功,当前账号名称:{new_name}.\n'
-                                               f'请继续选择您要增删改查的类型：客户(输入1),房间(输入2),退出(输入0):)')
+                    handle_send(client_socket, f'修改成功,当前账号名称:{new_name}.')
                     return True
                 else:
-                    handle_send(client_socket,'抱歉.该名称不存在.')
+                    handle_send(client_socket,'抱歉.该名称不存在或已标记为删除.')
                     return
         except pymysql.Error as e:
             conn.rollback()
@@ -169,7 +170,7 @@ class CustomerManager:
                 handle_send(client_socket,"金额格式无效（示例：100.50）,请重新选择您要修改的这位客户的内容(1修改账号，2修改余额，3注销):")
             amount = float(amount)
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE customers_table SET balance = %s WHERE name = %s",(amount, name))
+                cursor.execute("UPDATE customers_table SET balance = %s WHERE name = %s and is_deleted = 0",(amount, name))
                 cursor.execute("SELECT balance FROM customers_table WHERE name = %s",(name,))
                 new_balance = cursor.fetchone()[0]
                 conn.commit()
@@ -187,7 +188,7 @@ class CustomerManager:
             with conn.cursor() as cursor:
                 handle_send(client_socket, '请输入要注销的账号名称:')
                 name = handle_receive(client_socket)
-                cursor.execute("SELECT name FROM customers_table WHERE name = %s", (name,))
+                cursor.execute("SELECT name FROM customers_table WHERE name = %s ", (name,))
                 if cursor.fetchone():
                     cursor.execute("UPDATE customers_table SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP WHERE name = %s", (name,))
                     conn.commit()  # 提交更改
@@ -304,7 +305,7 @@ class CustomerService:
         name = handle_receive(client_socket)
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT name FROM customers_table WHERE name = %s", (name,))
+                cursor.execute("SELECT name FROM customers_table WHERE name = %s and is_deleted = 0", (name,))
                 if cursor.fetchone():
                     handle_send(client_socket,
                         f"登录成功\n客户:{name}\n请输入操作数(查询空房1,订房2,退房3,充值4,查询余额5,退出0):")
@@ -519,8 +520,9 @@ def handle_admin_customer_management(client_socket):
         请输入选择: """
         handle_send(client_socket, menu)
         choice = handle_receive(client_socket)
-        if not choice or choice == '0':
-            return True
+        if choice == '0':
+            _0_close_connection(client_socket)
+            break
         if choice == '1':  # 修改客户名称
             CustomerManager._1_modify_name(client_socket)
         elif choice == '2':  # 修改客户余额
