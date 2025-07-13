@@ -3,6 +3,7 @@ import pymysql
 from hotel_system.server.core.database import db_connection_handler
 from hotel_system.server.core.network import handle_send
 
+
 class AdminManager:
     """管理员功能封装类"""
     @staticmethod
@@ -29,6 +30,7 @@ class AdminManager:
                     cursor.execute(f"SELECT * FROM {table}")
                     result = cursor.fetchall()
                     handle_send(client_socket, f"{name}:\n{result}\n")
+
                 return True
         except pymysql.Error as e:
             handle_send(client_socket, f"查询表数据错误:{e}")

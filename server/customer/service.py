@@ -10,30 +10,60 @@ from hotel_system.server.customer.customer_manager import handle_customer_manage
 from hotel_system.server.room.room_manager import handle_room_management
 
 
+@db_connection_handler
+def auto_checkout(name,conn=None):  # 过期但未退房的房间，程序自动退房！！
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""SELECT room_number, check_in_time, duration_days
+                              FROM rooms_table
+                              WHERE customer_name = %s
+                                AND status = 'occupied'
+                                AND DATE_ADD(check_in_time, INTERVAL duration_days DAY) < NOW()""",
+                           (name,))  # （入住时间 ＋ 间隔n天）
+
+            expired_bookings = cursor.fetchall()
+            if expired_bookings:
+                for room, check_in_time, days in expired_bookings:
+                    cursor.execute("UPDATE rooms_table "
+                                   "SET status = 'vacant',"
+                                   " customer_name = NULL,"
+                                   "check_in_time = NULL,"
+                                   "duration_days = NULL"
+                                   "  WHERE room_number = %s", (room,))
+                    conn.commit()
+                    return [room[0] for room in expired_bookings]
+        return []
+    except pymysql.Error as e:
+        conn.rollback()
+        print(f'自动退房出错：{e}')
+        return False
+
 def handle_client(client_socket):
     try:
         while True:
             #避免暴力破解?  if nessary then attempts = 3 ...
-                choice = handle_receive(client_socket)
-                if not choice or choice is False:
+            choice = handle_receive(client_socket)
+            if choice is None:                              # 客户端断开
                     break
-                choice = choice.strip()
-                if choice == '1':
-                    CustomerService.login(client_socket)
-                    break
-                elif choice == '2':
-                    CustomerService.register(client_socket)
-                    break
-                elif choice == '9':
-                    handle_admin_operations(client_socket)
-                    break
-                elif choice == '0' or choice == "exit":
-                    close_connection(client_socket)
-                    break
-                else:
-                    handle_send(client_socket, "无效选择，请重新输入")
+            if not choice or choice is False:
+                break
+            choice = choice.strip()
+            if choice == '1':
+                CustomerService.login(client_socket)
+                break
+            elif choice == '2':
+                CustomerService.register(client_socket)
+                break
+            elif choice == '9':
+                handle_admin_operations(client_socket)
+                break
+            elif choice == '0' or choice == "exit":
+                close_connection(client_socket)
+                break
+            else:
+                handle_send(client_socket, "无效选择，请重新输入")
     except Exception as e:
-        print(f"处理客户端出错: {e}")
+        print(f"handle_client: {e}")
     except ConnectionResetError:
         print("客户端强制断开")
     finally:
@@ -84,8 +114,6 @@ def handle_admin_operations(client_socket):
             handle_send(client_socket, "无效的选择，请重新输入")
 
 
-
-
 def handle_body_choice(choice,client_socket,name):
     if choice == '1':
         CustomerService.get_vacant_rooms(client_socket)
@@ -120,8 +148,27 @@ class CustomerService:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT name FROM customers_table WHERE name = %s and is_deleted = 0", (name,))
                 if cursor.fetchone():
-                    handle_send(client_socket,
-                        f"登录成功\n客户:{name}\n查询空房1,订房2,退房3,充值4,查询余额5,退出0\n请输入操作数：")
+                    welcome_msg = f"登录成功\n客户:{name}\n"
+                    expired_rooms = auto_checkout(name)
+                    if expired_rooms:
+                        handle_send(client_socket, f"以下房间已自动退房: {', '.join(expired_rooms)}")
+                    cursor.execute("""
+                                   SELECT room_number,
+                                          TIMESTAMPDIFF(HOUR, check_in_time, NOW()) as hours_elapsed,
+                                          duration_days
+                                   FROM rooms_table
+                                   WHERE customer_name = %s
+                                     AND status = 'occupied'
+                                   """, (name,))
+                    bookings = cursor.fetchall()
+                    if bookings:
+                        for room, hours, days in bookings:
+                            remaining = (days * 24) - hours
+                            welcome_msg += f"\n您订的房间 {room}: 已入住 {hours // 24}天{hours % 24}小时"
+                            welcome_msg += f"\n剩余时间: {remaining // 24}天{remaining % 24}小时"
+                    welcome_msg += "\n请选择操作:\n1.查询空房 2.订房 3.退房 4.充值 5.查询余额 0.退出"
+                    handle_send(client_socket, welcome_msg)
+
                 else:
                     handle_send(client_socket, '''****************************\n该账号不存在。
                 1. 客户登录
@@ -228,33 +275,38 @@ class CustomerService:
                 handle_send(client_socket, f"空房有{vacant_rooms}\n请输入您要订的房间,输入后将自动扣除卡内金额100元:")
                 wanted_room = handle_receive(client_socket)
                 if not re.match(r'^\d{3}$', wanted_room):
-                    handle_send(client_socket,"房间号必须是三位数字。请重新输入操作数:")
+                    handle_send(client_socket,"")
+                    handle_send(client_socket, f'****************\n房间号必须是三位数字。\n\n\t查询空房1\n\t订房2\n\t退房3\n\t充值4\n\t查询余额5\n\t退出0\n**************\n请选择:')
                     return False
                 cursor.execute("SELECT status FROM rooms_table WHERE room_number = %s",(wanted_room,))
                 room_status = cursor.fetchone()
                 if (not room_status) or room_status[0] != 'vacant':
-                    handle_send(client_socket, "该房间已被租用或不存在。请重新输入操作数:")
+                    handle_send(client_socket, '****************\n该房间已被租用或不存在。\n\n\t查询空房1\n\t订房2\n\t退房3\n\t充值4\n\t查询余额5\n\t退出0\n**************\n请选择:')
+                    return False
+                handle_send(client_socket,"请输入天数（1-30）：")
+                days = int(handle_receive(client_socket))
+                if not 1<= days <= 30:
+                    handle_send(client_socket, '****************\n天数必须在1-30之间。\n\n\t查询空房1\n\t订房2\n\t退房3\n\t充值4\n\t查询余额5\n\t退出0\n**************\n请选择:')
                     return False
                 cursor.execute("SELECT balance FROM customers_table WHERE name = %s",(name,))
                 balance = cursor.fetchone()[0]
-                price = 100
+                price = 100 * days
                 if price > balance:
-                    send_inform = "余额不足,需前往充值后再订房,请输入操作数:"
-                    handle_send(client_socket, send_inform)
-                    return None
-                else:
-                    new_balance = balance - price
-                    cursor.execute("UPDATE customers_table SET balance = balance - %s WHERE name = %s",(price, name))
-                    cursor.execute("UPDATE rooms_table SET status = 'occupied', customer_name = %s WHERE room_number = %s",(name, wanted_room))
-                    conn.commit()#提交更改
-                    send_result = f'已从卡内扣除金额,订房成功,入住愉快.卡内余额:{new_balance} 元.'
-                    handle_send(client_socket, send_result)
+                    handle_send(client_socket, f'****************\n余额不足,需要{price}元，当前余额{balance}元\n\n\t查询空房1\n\t订房2\n\t退房3\n\t充值4\n\t查询余额5\n\t退出0\n**************\n请选择:')
+                    return False
+                cursor.execute("UPDATE rooms_table SET status = 'occupied', customer_name = %s,check_in_time = NOW(),"
+                               "duration_days = %s WHERE room_number = %s",(name,days, wanted_room))
+                cursor.execute("UPDATE customers_table SET balance = balance - %s WHERE name = %s",(price, name))
+                conn.commit()#提交更改
+                send_result = f'订房成功,入住愉快.\n房间:{wanted_room} 花费:{price} 元.'
+                handle_send(client_socket, send_result)
             return True
-        except pymysql.Error as e:
+        except (pymysql.Error, ValueError) as e:
             conn.rollback()
             print(f'订房错误:{e}')
-            handle_send(client_socket, "订房失败,请稍后再试")
+            handle_send(client_socket, "订房失败.")
             return False
+
     @staticmethod
     @db_connection_handler
     def checkout_room(client_socket, name,conn=None):
@@ -309,11 +361,11 @@ class CustomerService:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT balance FROM customers_table WHERE name = %s",(name,))
                 balance = cursor.fetchone()[0]
-                send_balance = f'卡内余额:{balance} 元'
+                send_balance = f'****************\n卡内余额:{balance} 元'
                 cursor.execute("SELECT room_number FROM rooms_table WHERE customer_name = %s",(name,))
                 rented_rooms = [row[0] for row in cursor.fetchall()]
             if rented_rooms:
-                send_balance += (f'****************\n您当前租用的房间为:{rented_rooms}'
+                send_balance += (f'您当前租用的房间为:{rented_rooms}'
                                  f'\n\t查询空房1\n\t订房2\n\t退房3\n\t充值4\n\t查询余额5\n\t退出0\n**************\n请选择:')
             handle_send(client_socket, send_balance)
             return True

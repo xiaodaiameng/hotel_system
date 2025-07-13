@@ -49,6 +49,8 @@ def init_database(conn = None):
                                 (room_number VARCHAR(10) PRIMARY KEY,
                                 status ENUM('vacant','occupied') DEFAULT 'vacant',
                                 customer_name VARCHAR(50),
+                                check_in_time DATETIME DEFAULT NULL,
+                                duration_days INT DEFAULT 1,
                                 FOREIGN KEY (customer_name) REFERENCES customers_table(name) ON DELETE SET NULL)""")
             #初始化:管理员密码
             cursor.execute("SELECT COUNT(*) FROM managers_table")
